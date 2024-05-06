@@ -166,8 +166,12 @@ app.post('/api/EscenaObjeto', function (req, res) {
             res.status(400).send('Failed to create EscenaObjeto.');
         }
     }).catch(err => {
-        console.error(err);
-        res.status(500).send('Failed to insert EscenaObjeto into the database.');
+        console.error("SQL Error: ", err);
+        if (err.originalError && err.originalError.info) {
+            res.status(500).send(`SQL Error: ${err.originalError.info.message}`);
+        } else {
+            res.status(500).send('Failed to insert EscenaObjeto into the database.');
+        }
     });
 });
 
