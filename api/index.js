@@ -195,34 +195,18 @@ app.post('/api/Escena', (req, res) => {
 });
 
 app.get('/api/load-all-objects', (req, res) => {
-    const sqlQuery = "SELECT id_objeto, titulo, imgUrl, objUrl, mtlUrl, Empresa FROM Objeto"; // Consulta SQL para obtener todos los objetos
+    const sqlQuery = "SELECT id_objeto, titulo, imgUrl, objUrl, mtlUrl, Empresa FROM Objeto";
 
-    // Ejecuta la consulta SQL utilizando la instancia de conexión
     dblClick.connect().then(pool => {
         return pool.request().query(sqlQuery);
     }).then(result => {
-        // Procesa el resultado de la consulta
-        if (result.recordset.length > 0) {
-            const urls = result.recordset.map(row => ({
-                id_objeto:row.id_objeto,
-                Titulo: row.titulo,
-                objUrl: row.objUrl,
-                mtlUrl: row.mtlUrl,
-                imgUrl: row.imgUrl,
-                Empresa: row.Empresa
-
-
-            }));
-            res.status(200).json(urls); // Envía un arreglo de objetos JSON con las URLs recuperadas
-        } else {
-            res.status(404).json({ error: "No se encontraron objetos" }); // Envía un mensaje JSON si no se encontraron objetos
-        }
+        res.status(200).json(result.recordset);
     }).catch(err => {
-        // Maneja los errores de consulta
-        console.log('Error de consulta:', err);
-        res.status(500).json({ error: "Error interno del servidor" }); // Envía un mensaje JSON de error interno del servidor
-    });
+        console.log('Error:', err);
+        res.status(500).json({ error: "Internal Server Error" });
+    });
 });
+
 // Create
 app.post('/api/Usuario', (req, res) => {
     sql.connect(config, err => {
