@@ -104,31 +104,7 @@ app.get('/api/Escena/:id_escena', function (req, res) {
     });
     
 });
-/*
-app.get('/api/EscenaObjeto/:id_escenaObjeto', function (req, res) {
-   
-    // connect to your database
-    sql.connect(config, function (err) {
-    
-        if (err) console.log(err);
 
-        // create Request object
-        var request = new sql.Request();
-           
-        // query to the database and get the records
-        sentencia = "select * from EscenaObjeto where id_escenaObjeto = " + req.params.id_escenaObjeto;
-        console.log(sentencia);
-        request.query(sentencia, function (err, recordset) {
-            
-            if (err) console.log(err)
-
-            // send records as a response
-            res.send(recordset.recordset[0]);
-            
-        });
-    });
-});
-*/
 // Existing index.js setup
 // Modify the /api/EscenaObjeto endpoint to join with Objeto table
 app.get('/api/EscenaObjeto', function (req, res) {
@@ -198,20 +174,21 @@ app.post('/api/Escena', (req, res) => {
     sql.connect(config, err => {
         if (err) {
             console.log(err);
-            res.status(500).send('No se puede connectar a la base de datos.');
+            res.status(500).send('No se puede conectar a la base de datos.');
         } else {
             const request = new sql.Request();
             console.log(req.body);
             const { id_usuario } = req.body;
-            sentencia = `INSERT INTO Escena (id_escena, id_usuario) VALUES (((SELECT max(id_escena) as ultimo FROM Escena)+1), '${id_usuario}')`;
-            console.log(sentencia);
+            const sentencia = `INSERT INTO Escena (id_escena, id_usuario) OUTPUT Inserted.id_escena VALUES (((SELECT max(id_escena) FROM Escena) + 1), @id_usuario)`;
+            request.input('id_usuario', sql.VarChar, id_usuario);
             request.query(sentencia, (err, result) => {
-            if (err) {
-                console.log(err);
-                res.status(500).send('No se pudo crear el registro.');
-            } else {
-                res.status(201).send('Registro creado.');
-            }
+                if (err) {
+                    console.log(err);
+                    res.status(500).send('No se pudo crear el registro.');
+                } else {
+                    console.log('Nuevo id_escena:', result.recordset[0].id_escena);
+                    res.status(201).send({id_escena: result.recordset[0].id_escena, message: 'Registro creado.'});
+                }
             });
         }
     });
