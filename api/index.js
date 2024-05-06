@@ -118,7 +118,7 @@ app.get('/api/EscenaObjeto', function (req, res) {
         }
 
         var request = new sql.Request();
-        let query = `SELECT eo.id_escenaObjeto, eo.escala, eo.posicion, o.objUrl, o.mtlUrl
+        let query = `SELECT eo.id_escenaObjeto, eo.escala, eo.posicion, o.objUrl, o.mtlUrl, o.titulo
                      FROM EscenaObjeto eo
                      JOIN Objeto o ON eo.id_objeto = o.id_objeto`;
         if (id_escena) {
