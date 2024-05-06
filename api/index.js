@@ -194,17 +194,21 @@ app.post('/api/Escena', (req, res) => {
     });
 });
 
-app.get('/api/load-all-objects', (req, res) => {
-    const sqlQuery = "SELECT id_objeto, titulo, imgUrl, objUrl, mtlUrl, Empresa FROM Objeto";
-
-    dblClick.connect().then(pool => {
-        return pool.request().query(sqlQuery);
-    }).then(result => {
-        res.status(200).json(result.recordset);
-    }).catch(err => {
-        console.log('Error:', err);
+app.get('/api/load-all-objects', async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const sqlQuery = "SELECT id_objeto, titulo, imgUrl, objUrl, mtlUrl, Empresa FROM Objeto";
+        const result = await pool.request().query(sqlQuery);
+        
+        if (result.recordset.length > 0) {
+            res.status(200).json(result.recordset);
+        } else {
+            res.status(404).json({ message: "No objects found" });
+        }
+    } catch (err) {
+        console.error('Failed to retrieve objects:', err);
         res.status(500).json({ error: "Internal Server Error" });
-    });
+    }
 });
 
 // Create
