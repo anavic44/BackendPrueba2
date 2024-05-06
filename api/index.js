@@ -205,7 +205,7 @@ app.get('/api/load-all-objects', function (req, res)  {
             if (err) console.log(err)
 
             // send records as a response
-            res.send(recordset.recordset[0]);
+            res.send(recordset.recordset);
             
         });
     });
