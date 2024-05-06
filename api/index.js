@@ -43,6 +43,7 @@ app.get('/api/Objeto/:id_objeto', function (req, res) {
     
 });
 
+
 // Update EscenaObjeto
 app.put('/api/EscenaObjeto/:id_escenaObjeto', function (req, res) {
     // Connect to your database
@@ -193,7 +194,28 @@ app.post('/api/EscenaObjeto', function (req, res) {
         res.status(500).send('Failed to insert EscenaObjeto into the database.');
     });
 });
-
+app.post('/api/Escena', (req, res) => {
+    sql.connect(config, err => {
+        if (err) {
+            console.log(err);
+            res.status(500).send('No se puede connectar a la base de datos.');
+        } else {
+            const request = new sql.Request();
+            console.log(req.body);
+            const { id_usuario } = req.body;
+            sentencia = `INSERT INTO Escena (id_escena, id_usuario) VALUES (((SELECT max(id_escena) as ultimo FROM Escena)+1), '${id_usuario}')`;
+            console.log(sentencia);
+            request.query(sentencia, (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send('No se pudo crear el registro.');
+            } else {
+                res.status(201).send('Registro creado.');
+            }
+            });
+        }
+    });
+});
 
 // Create
 app.post('/api/Usuario', (req, res) => {
