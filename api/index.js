@@ -170,30 +170,29 @@ app.post('/api/EscenaObjeto', function (req, res) {
         res.status(500).send('Failed to insert EscenaObjeto into the database.');
     });
 });
+
 app.post('/api/Escena', (req, res) => {
     sql.connect(config, err => {
         if (err) {
             console.log(err);
-            res.status(500).send('No se puede conectar a la base de datos.');
+            res.status(500).send('No se puede connectar a la base de datos.');
         } else {
             const request = new sql.Request();
             console.log(req.body);
-            const { id_usuario } = req.body;
-            const sentencia = `INSERT INTO Escena (id_escena, id_usuario) OUTPUT Inserted.id_escena VALUES (((SELECT max(id_escena) FROM Escena) + 1), @id_usuario)`;
-            request.input('id_usuario', sql.VarChar, id_usuario);
+            const { id_usuario} = req.body;
+            sentencia = `INSERT INTO Escena (id_escena, id_usuario) VALUES (((SELECT max(id_escena) as ultimo FROM Escena)+1), '${id_usuario}')`;
+            console.log(sentencia);
             request.query(sentencia, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).send('No se pudo crear el registro.');
-                } else {
-                    console.log('Nuevo id_escena:', result.recordset[0].id_escena);
-                    res.status(201).send({id_escena: result.recordset[0].id_escena, message: 'Registro creado.'});
-                }
+            if (err) {
+                console.log(err);
+                res.status(500).send('No se pudo crear el registro.');
+            } else {
+                res.status(201).send('Registro creado.');
+            }
             });
         }
     });
 });
-
 app.get('/api/load-all-objects', function (req, res)  {
     sql.connect(config, function (err) {
         if (err) console.log(err);
